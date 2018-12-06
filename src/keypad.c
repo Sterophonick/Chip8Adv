@@ -4,11 +4,11 @@
 u8 keyA = 0;
 u8 keyB = 1;
 u8 keyUp = 5;
-u8 keyDown = 8;
+u8 key_Down = 8;
 u8 keyLeft = 7;
 u8 keyRight = 9;
 u8 keySel = 6;
-u8 keyStart = 8;
+u8 keyStart = 0xA;
 
 void Keypad()
 {
@@ -32,9 +32,9 @@ void Keypad()
 	}
 	if(keyDown(KEY_DOWN))
 	{
-		key[keyDown] = 1;
+		key[key_Down] = 1;
 	}else{
-		key[keyDown] = 0;
+		key[key_Down] = 0;
 	}
 	if(keyDown(KEY_LEFT))
 	{

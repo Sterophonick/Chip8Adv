@@ -1,10 +1,10 @@
 HEADERS =
-OBJECTS = build/main.o build/cpu.o build/menu.o build/lang.o build/keypad.o
+OBJECTS = build/main.o build/cpu.o build/menu.o build/lang.o build/keypad.o build/pogoshell.o build/cpu_s.out
 CPPFILES =
 # SOURCES = src/main.c src/mem.c src/cpu.c src/hardware.c src/keypad.c
 ASM =
-CFLAGS = -DHRT_WITH_LIBHEART -Wall -Ofast -march=armv4t -Wno-switch -Wno-multichar -ffast-math -mlong-calls -mcpu=arm7tdmi -mtune=arm7tdmi -marm -faggressive-loop-optimizations -fverbose-asm 
-ARCH = -mthumb -mthumb-interwork
+CFLAGS = -DHRT_WITH_LIBHEART -Wall -Os -march=armv4t -Wno-switch -Wno-multichar -ffast-math -mlong-calls -mcpu=arm7tdmi -mtune=arm7tdmi -marm -faggressive-loop-optimizations -fverbose-asm 
+ARCH = -mthumb-interwork
 SPECS = -specs=gba.specs
 PREFIX = C:\devkitPro\devkitARM\bin\arm-none-eabi-
 
@@ -17,7 +17,7 @@ build/%.o: src/%.cpp $(HEADERS)
 	$(PREFIX)g++ $(CFLAGS) $(ARCH) -c $< -o $@
 	
 build/%.out: src/%.s
-	$(PREFIX)as  -mthumb -mthumb-interwork -mcpu=arm7tdmi $< -o $@
+	$(PREFIX)as  -mthumb-interwork -mcpu=arm7tdmi $< -o $@
 	
 build/main.elf: $(OBJECTS)
 	$(PREFIX)gcc $(SPECS) $(ARCH) $(OBJECTS) -lheart -lm -o build/main.elf
