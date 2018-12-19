@@ -17,3 +17,4 @@ extern char *gl_vsync_options[3];
 extern char *gl_cycles_frame_options[8];
 extern u32 gl_autosleep_times[4];
 extern char gl_request_ext[];
+extern  char *gl_brightness_options[5];

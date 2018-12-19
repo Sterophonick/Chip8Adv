@@ -1,7 +1,7 @@
 #include <libheart.h>
 #include "cpu.h"
 #include "lang.h"
-#include "car.h"
+#include "f8z.h"
 
 u32 autosleeptimer;
 
@@ -19,17 +19,19 @@ char setUpperNibble(char orig, char nibble) {
     return res;
 }
 
-int main()
+int main() 
 {
 	hrt_Init();
+	hrt_EnableRTC();
 	hrt_DSPSetBGMode(4);
 	hrt_DSPEnableBG(2);
 	hrt_DSPDisableForceBlank();
-	DetectPogoshell();
+	DetectPogo();
 	Initialize();
 	hrt_FXSetBlendMode(FX_MODE_DARKEN);
 	hrt_FXEnableBGTarget1(2);
 	autosleeptimer = 0;
+	updatevsync = 1;
 	while(1)
 	{
 		hrt_SleepF(Chip8Adv->vsync);
@@ -47,7 +49,7 @@ int main()
 			render();
 		}
 		Keypad();
-		for(int i = 0; i < gl_clock_speeds[Chip8Adv->clockspeed]; i++)
+		for(register int i = 0; i < gl_clock_speeds[Chip8Adv->clockspeed]; i++)
 		{
 			emulateCycle();
 		}
@@ -55,7 +57,8 @@ int main()
 			{
 				if(keyDown(KEY_L))
 				{
-					for(int i=0;i<16;i++)
+					hrt_FXSetBlendMode(FX_MODE_DARKEN);
+					for(register int i=0;i<16;i++)
 					{
 						hrt_VblankIntrWait();
 						hrt_SetFXLevel(i);

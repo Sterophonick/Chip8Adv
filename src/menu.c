@@ -7,6 +7,9 @@ emu* Chip8Adv = (emu*)0xE000000;
 void help();
 void OtherSettings();
 void DisplaySettings();
+void drawclock();
+
+u8 updatevsync=0;
 
 	u8 returns[3];
 	u8 disploop;
@@ -24,7 +27,6 @@ void menu()
 	}
 	hrt_PrintOnTilemap(0, 18, (char*)gl_credit_ln0);
 	hrt_PrintOnTilemap(0, 19, (char*)gl_credit_ln1);
-	
 	arpos = 0;
 	for(int i=0;i<16;i++)
 	{
@@ -34,6 +36,7 @@ void menu()
 	while(!(keyDown(KEY_B)))
 	{
 		hrt_VblankIntrWait();
+		drawclock();
 		hrt_PrintOnTilemap(0, 7+arpos, "*");
 		if(keyDown(KEY_DOWN))
 		{
@@ -100,6 +103,7 @@ void menu()
 	hrt_DSPEnableBG(2);
 	hrt_DSPDisableForceBlank();
 	render();
+	hrt_FXSetBlendMode(FX_MODE_DARKEN);
 				for(int i=0;i<16;i++)
 				{
 					hrt_VblankIntrWait();
@@ -210,6 +214,7 @@ void OtherSettings()
 					{
 						if(arpos == 0)
 						{
+							updatevsync = 1;
 							Chip8Adv->vsync++;
 							if(Chip8Adv->vsync > 2)
 							{
@@ -302,6 +307,9 @@ void DisplaySettings()
 				hrt_PrintOnTilemap(0, 18, (char*)gl_credit_ln0);
 				hrt_PrintOnTilemap(0, 19, (char*)gl_credit_ln1);
 				hrt_PrintOnTilemap(0, 0, (char*)gl_menu_titles[1]);
+				hrt_PrintOnTilemap(10, 7, (char*)gl_palettes[Chip8Adv->palette]);
+				hrt_PrintOnTilemap(13, 8, (char*)gl_brightness_options[Chip8Adv->brightness]);
+				hrt_PrintOnTilemap(14, 9, (char*)gl_vsync_options[Chip8Adv->dblsize]);
 				for(int i=0;i<16;i++)
 				{
 					hrt_VblankIntrWait();
@@ -341,11 +349,38 @@ void DisplaySettings()
 						if(arpos == 0)
 						{
 							Chip8Adv->palette++;
-							if(Chip8Adv->palette > 7)
+							if(Chip8Adv->palette > 6)
 							{
 								Chip8Adv->palette = 0;
 							}
 							hrt_PrintOnTilemap(10, 7, (char*)gl_palettes[Chip8Adv->palette]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 1)
+						{
+							Chip8Adv->brightness++;
+							if(Chip8Adv->brightness > 4)
+							{
+								Chip8Adv->brightness = 0;
+							}
+							hrt_PrintOnTilemap(13, 8, (char*)gl_brightness_options[Chip8Adv->brightness]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 2)
+						{
+							updatevsync = 1;
+							Chip8Adv->dblsize++;
+							if(Chip8Adv->dblsize > 1)
+							{
+								Chip8Adv->dblsize = 0;
+							}
+							hrt_PrintOnTilemap(14, 9, (char*)gl_vsync_options[Chip8Adv->dblsize]);
 							while(keyDown(KEY_A))
 							{
 								hrt_VblankIntrWait();
@@ -386,4 +421,41 @@ void RequestExit()
 	hrt_PrintOnTilemap(0, 0, (char*)gl_request_ext);
 	hrt_SleepF(60);
 	hrt_EZ4Exit();
+}
+
+void debugger()
+{
+	/*
+	hrt_InitTiledText(2);
+	hrt_DSPSetBGMode(0);
+	hrt_ClearTiledText();
+	hrt_DSPEnableBG(2);
+	hrt_PrintOnTilemap(0, 0, "PC: %x", Chip8.pc);
+	hrt_PrintOnTilemap(0, 1, "OP: %x", Chip8.opcode);
+	while(1);
+	*/
+}
+
+void drawclock()
+{
+    char str[30];
+    char *s=str+20;
+    int timer,mod;
+	strcpy(str,"                    00:00:00");
+	timer=hrt_GetRTCTime();
+	mod=(timer>>4)&3;				//Hours.
+	*(s++)=(mod+'0');
+	mod=(timer&15);
+	*(s++)=(mod+'0');
+	s++;
+	mod=(timer>>12)&15;				//Minutes.
+	*(s++)=(mod+'0');
+	mod=(timer>>8)&15;
+	*(s++)=(mod+'0');
+	s++;
+	mod=(timer>>20)&15;				//Seconds.
+	*(s++)=(mod+'0');
+	mod=(timer>>16)&15;
+	*(s++)=(mod+'0');
+	hrt_PrintOnTilemap(2, 0, str);
 }

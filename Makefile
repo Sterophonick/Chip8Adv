@@ -3,7 +3,7 @@ OBJECTS = build/main.o build/cpu.o build/menu.o build/lang.o build/keypad.o buil
 CPPFILES =
 # SOURCES = src/main.c src/mem.c src/cpu.c src/hardware.c src/keypad.c
 ASM =
-CFLAGS = -DHRT_WITH_LIBHEART -Wall -Os -march=armv4t -Wno-switch -Wno-multichar -ffast-math -mlong-calls -mcpu=arm7tdmi -mtune=arm7tdmi -marm -faggressive-loop-optimizations -fverbose-asm 
+CFLAGS = -DHRT_WITH_LIBHEART -Wall -Ofast -march=armv4t -Wno-switch -Wno-multichar -ffast-math -mlong-calls -mcpu=arm7tdmi -mtune=arm7tdmi -marm -faggressive-loop-optimizations -fverbose-asm 
 ARCH = -mthumb-interwork
 SPECS = -specs=gba.specs
 PREFIX = C:\devkitPro\devkitARM\bin\arm-none-eabi-

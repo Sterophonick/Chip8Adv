@@ -1,13 +1,11 @@
 #include <libheart.h>
 #include "cpu.h"
 
-char pogoshell_romname[32]; 	//keep track of rom name (for state saving, etc)
-char pogoshell;
-int pogosize=0;			//size of rom if starting from pogoshell
+int pogoshell;
+u32 pogotemp;
 
-
-void DetectPogoshell()
+void DetectPogo()
 {
-	u32 temp=(u32)(*(u8**)0x0203FBFC);
-	pogoshell=((temp & 0xFE000000) == 0x08000000)?1:0;
+	pogotemp=(u32)(*(u8**)0x0203FBFC);
+	pogoshell=((pogotemp & 0xFE000000) == 0x08000000)?1:0;
 }

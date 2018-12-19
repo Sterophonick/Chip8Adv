@@ -18,6 +18,13 @@
 .global opLDBV
 .global opLDFV
 .global opCALL
+.global opLDHV
+.global opSETI
+.global opSETPC
+.global opADDPC
+.global opLDVM
+.global CopySCRN
+.global opSETDT
 
 V0 = 0
 V1 = 1
@@ -126,8 +133,23 @@ opLDBV:
 	ldr r2,=Chip8
 	ldrb r3,[r2,r1]
 	mov r4,r3
+	add r4,r0
 	strb r4,[r2,r1]
 	pop {r2-r4}
+	bx lr
+	
+//r0: src reg
+//r1: dst reg
+//Chip8.DelayTimer = Chip8.V[Chip8.x]
+opLDHV:
+	push {r0-r4}
+	ldrb r0,[r0]
+	ldr r2,=Chip8
+	ldrb r3,[r2,r1]
+	mov r4,r3
+	add r4,r0
+	strh r4,[r2,r1]
+	pop {r0-r4}
 	bx lr
 
 //r0 reg1
@@ -148,17 +170,63 @@ opLDFV:
 			//stack[Chip8.sp++] = Chip8.pc + 2;
 			// Chip8.pc = addr
 opCALL:
-	push {r1-r3}
+	push {r1-r4}
 	ldr r1,=Chip8
-	ldrh r2,[r1,#C_SP]
+	ldr r2,=stack
 	ldrh r3,[r1,#C_pc]
-	ldr r1,=stack
-	strh r3,[r1,r2]
-	add r3,r3,#2
-	add r2,r2,#1
-	strh r3,[r1,r2]
-	mov r3,r0
-	strh r3,[r1,#C_pc]
-	pop {r1-r3}
+	ldrh r4,[r1,#22]
+	strh r3,[r2,r4]
+	add r4,#1
+	add r3,#2
+	strh r3,[r2,r4]
+	pop {r1-r4}
 	bx lr
 	
+//r0: byte
+//Chip8.I2 = Chip8.nnn
+opSETI:
+	push {r1}
+	ldr r1,=Chip8+18
+	strh r0,[r1]
+	pop {r1}
+	bx lr
+
+//r0: value
+opSETPC:
+	push {r1-r2}
+	ldr r1,=Chip8+C_pc
+	strh r0,[r1]
+	pop {r1-r2}
+	bx lr
+
+opADDPC:
+	push {r1-r2}
+	ldr r1,=Chip8+C_pc
+	ldr r2,[r1]
+	add r2,r0
+	strh r2,[r1]
+	pop {r1-r2}
+	bx lr
+
+//r0: Reg1
+//r1: memory location (hword)
+//Chip8.V[Chip8.x] = Chip8.kk
+opLDVM:
+	push {r2-r5}
+	ldr r2,=Chip8
+	ldrb r3,[r2,r0]
+	ldr r4,=memory
+	ldrb r5,[r4,r1]
+	mov r3,r5
+	strb r3,[r2,r5]
+	pop {r2-r3}
+	bx lr
+	
+//r0: register
+opSETDT:
+	push {r1}
+	ldr r1,=Chip8
+	ldrb r2,[r1,r0]
+	strb r2,[r3,#16]
+	pop {r1}
+	bx lr

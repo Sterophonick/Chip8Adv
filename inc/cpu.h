@@ -32,17 +32,12 @@ extern void Keypad();
 extern void render();
 extern const unsigned char rom[];
 extern u8 memory[4096]; //RAM
-extern u16 videobuffer[64][128]; //video before it gets copied to RAM
+extern u16 videobuffer[64*128]; //video before it gets copied to RAM
 extern u16 stack[16];
 extern u8 key[16];
 extern void tick();
 
 #define MAX_GAME_SIZE (0x1000 - 0x200)
-
-
-extern char pogoshell_romname[32]; 	//keep track of rom name (for state saving, etc)
-extern char pogoshell;
-extern int pogosize;			//size of rom if starting from pogoshell
 
 typedef struct
 {
@@ -72,12 +67,25 @@ extern void opADDVB(u8 reg, u8 byte);
 extern void opSE(u8 reg, u8 byte);
 extern void opSNE(u8 reg, u8 byte);
 extern void opLDBV(u8 byte, u8 reg);
+extern void opLDVM(u8 reg, u16 addr);
+extern void opLDHV(u8 src, u16 dst);
 extern void opLDFV(u8 reg);
 extern void opCALL(u16 addr);
 extern void opSCDWN(u8 n);
+extern void opSETI(u16 value);
+extern void opSETPC(u16 value);
+extern void opADDPC(u16 value);
+extern void opSETDT(u8 value);
 
 extern void menu();
-extern void DetectPogoshell();
 extern void RequestExit();
 
+extern void debugger();
+
 extern u32 autosleeptimer;
+
+extern void DetectPogo();
+extern int pogoshell;
+extern u32 pogotemp;
+
+extern u8 updatevsync;

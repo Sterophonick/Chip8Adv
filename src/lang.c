@@ -19,7 +19,7 @@ const char *gl_controller_options[2] = {
 const char *gl_display_options[4] = {
 	"Palette: ",
 	"Brightness: ",
-	"Double size",
+	"Double size: ",
 	"<-Back",
 };
 
@@ -137,3 +137,11 @@ const unsigned long gl_autosleep_times[4] = {
 };
 
 const char gl_request_ext[]="Exit requested, quitting now.";
+
+const char *gl_brightness_options[5] = {
+	"|    ",
+	"||   ",
+	"|||  ",
+	"|||| ",
+	"|||||",
+};
