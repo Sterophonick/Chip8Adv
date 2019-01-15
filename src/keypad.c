@@ -1,68 +1,112 @@
 #include <libheart.h>
 #include "cpu.h"
 //0-F
-u8 keyA = 0;
-u8 keyB = 1;
-u8 keyUp = 5;
-u8 key_Down = 8;
-u8 keyLeft = 7;
-u8 keyRight = 9;
-u8 keySel = 6;
-u8 keyStart = 0xA;
+u8 colorLock;
+u8 speedLock;
+u8 vsyncLock;
 
 void Keypad()
 {
 	if(keyDown(KEY_A))
 	{
-		key[keyA] = 1;
+		key[Chip8Adv->a_key] = 1;
 	}else{
-		key[keyA] = 0;
+		key[Chip8Adv->a_key] = 0;
 	}
 	if(keyDown(KEY_B))
 	{
-		key[keyB] = 1;
+		key[Chip8Adv->b_key] = 1;
 	}else{
-		key[keyB] = 0;
+		key[Chip8Adv->b_key] = 0;
 	}
 	if(keyDown(KEY_UP))
 	{
-		key[keyUp] = 1;
+		key[Chip8Adv->up_key] = 1;
 	}else{
-		key[keyUp] = 0;
+		key[Chip8Adv->up_key] = 0;
 	}
 	if(keyDown(KEY_DOWN))
 	{
-		key[key_Down] = 1;
+		key[Chip8Adv->down_key] = 1;
 	}else{
-		key[key_Down] = 0;
+		key[Chip8Adv->down_key] = 0;
 	}
 	if(keyDown(KEY_LEFT))
 	{
-		key[keyLeft] = 1;
+		key[Chip8Adv->left_key] = 1;
 	}else{
-		key[keyLeft] = 0;
+		key[Chip8Adv->left_key] = 0;
 	}
 	if(keyDown(KEY_RIGHT))
 	{
-		key[keyRight] = 1;
+		key[Chip8Adv->right_key] = 1;
 	}else{
-		key[keyRight] = 0;
+		key[Chip8Adv->right_key] = 0;
 	}
 	if(keyDown(KEY_SELECT))
 	{
-		key[keySel] = 1;
+		key[Chip8Adv->sel_key] = 1;
 	}else{
-		key[keySel] = 0;
+		key[Chip8Adv->sel_key] = 0;
 	}
 	if(keyDown(KEY_START))
 	{
-		key[keyStart] = 1;
+		key[Chip8Adv->strt_key] = 1;
 	}else{
-		key[keyStart] = 0;
+		key[Chip8Adv->strt_key] = 0;
 	}
 }
 
 void MiscKeys()
 {
-	
+	if(keyDown(KEY_L))
+	{
+		if(keyDown(KEY_START))
+		{
+			if(keyDown(KEY_A)) //Exit
+			{
+				hrt_FXSetBlendMode(FX_MODE_BRIGHTEN);
+				hrt_FXEnableBackdrop(0);
+				for(int i=0;i<16;i++)
+				{
+					hrt_VblankIntrWait();
+					hrt_SetFXLevel(i);
+				}
+				hrt_EZ4Exit();
+			}
+			if(!vsyncLock)
+			{
+				Chip8Adv->vsync++;
+				if(Chip8Adv->vsync > 2)
+				{
+					Chip8Adv->vsync = 0;
+				}
+				vsyncLock = 1;
+			}
+		}else if(keyDown(KEY_SELECT)){
+			if(!colorLock)
+			{
+				Chip8Adv->palette++;
+				if(Chip8Adv->palette > 6)
+				{
+					Chip8Adv->palette = 0;
+				}
+				colorLock = 1;
+			}
+		}else if(keyDown(KEY_A)){
+			if(!speedLock)
+			{
+				Chip8Adv->clockspeed++;
+				if(Chip8Adv->clockspeed> 7)
+				{
+					Chip8Adv->clockspeed = 0;
+				}
+				speedLock = 1;
+			}
+		}else{
+			vsyncLock = 0;
+			colorLock = 0;
+			speedLock = 0;
+		}
+	}
 }

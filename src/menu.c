@@ -8,6 +8,8 @@ void help();
 void OtherSettings();
 void DisplaySettings();
 void drawclock();
+void ControllerSettings();
+void RemapButtons();
 
 u8 updatevsync=0;
 
@@ -28,7 +30,7 @@ void menu()
 	hrt_PrintOnTilemap(0, 18, (char*)gl_credit_ln0);
 	hrt_PrintOnTilemap(0, 19, (char*)gl_credit_ln1);
 	arpos = 0;
-	for(int i=0;i<16;i++)
+	for(register int i=0;i<16;i++)
 	{
 		hrt_VblankIntrWait();
 		hrt_SetFXLevel(16-i);
@@ -66,6 +68,10 @@ void menu()
 		}
 		if(keyDown(KEY_A))
 		{
+			if(arpos == 0)
+			{
+				ControllerSettings();
+			}
 			if(arpos == 1)
 			{
 				DisplaySettings();
@@ -94,6 +100,13 @@ void menu()
 			}
 			if(arpos == 6)
 			{
+				hrt_FXSetBlendMode(FX_MODE_BRIGHTEN);
+				hrt_FXEnableBackdrop(0);
+				for(int i=0;i<16;i++)
+				{
+					hrt_VblankIntrWait();
+					hrt_SetFXLevel(i);
+				}
 				hrt_EZ4Exit();
 			}
 		}
@@ -412,6 +425,92 @@ void DisplaySettings()
 				}
 }
 
+void ControllerSettings()
+{
+				arpos = 0;
+				for(int i=0;i<16;i++)
+				{
+					hrt_VblankIntrWait();
+					hrt_SetFXLevel(i);
+				}
+				hrt_ClearTiledText();
+				for(disploop = 0; disploop < 2; disploop++)
+				{
+					hrt_PrintOnTilemap(1, 7+disploop, (char*)gl_controller_options[disploop]);
+				}
+				hrt_PrintOnTilemap(0, 18, (char*)gl_credit_ln0);
+				hrt_PrintOnTilemap(0, 19, (char*)gl_credit_ln1);
+				hrt_PrintOnTilemap(0, 0, (char*)gl_menu_titles[0]);
+				for(int i=0;i<16;i++)
+				{
+					hrt_VblankIntrWait();
+					hrt_SetFXLevel(16-i);
+				}
+				while(!(keyDown(KEY_B)))
+				{
+		hrt_PrintOnTilemap(0, 7+arpos, "*");
+		if(keyDown(KEY_DOWN))
+		{
+			hrt_PrintOnTilemap(0, 7+arpos, " ");
+			if(!(arpos > 2))
+			{
+				arpos++;
+			}
+			hrt_PrintOnTilemap(0, 7+arpos, "*");
+			while(keyDown(KEY_DOWN))
+			{
+				hrt_VblankIntrWait();
+			}
+		}
+		if(keyDown(KEY_UP))
+		{
+			hrt_PrintOnTilemap(0, 7+arpos, " ");
+			if(arpos > 0)
+			{
+				arpos--;
+			}
+			hrt_PrintOnTilemap(0, 7+arpos, "*");
+			while(keyDown(KEY_UP))
+			{
+				hrt_VblankIntrWait();
+			}
+				}
+					if(keyDown(KEY_A))
+					{
+						if(arpos == 0)
+						{
+							RemapButtons();
+						}
+						if(arpos == 1)
+						{
+							break;
+						}
+					}
+				}
+				for(int i=0;i<16;i++)
+				{
+					hrt_VblankIntrWait();
+					hrt_SetFXLevel(i);
+				}
+				hrt_ClearTiledText();
+				while(keyDown(KEY_A))
+				{
+					hrt_VblankIntrWait();
+				}
+	for(disploop = 0; disploop < 8; disploop++)
+	{
+		hrt_PrintOnTilemap(1, 7+disploop, (char*)gl_main_menu_options[disploop]);
+	}
+	hrt_PrintOnTilemap(0, 18, (char*)gl_credit_ln0);
+	hrt_PrintOnTilemap(0, 19, (char*)gl_credit_ln1);
+	arpos = 0;
+	for(register int i=0;i<16;i++)
+	{
+		hrt_VblankIntrWait();
+		hrt_SetFXLevel(16-i);
+	}
+}
+
 void RequestExit()
 {
 	hrt_InitTiledText(2);
@@ -458,4 +557,196 @@ void drawclock()
 	mod=(timer>>16)&15;
 	*(s++)=(mod+'0');
 	hrt_PrintOnTilemap(2, 0, str);
+}
+
+void RemapButtons()
+{
+				arpos = 0;
+				for(int i=0;i<16;i++)
+				{
+					hrt_VblankIntrWait();
+					hrt_SetFXLevel(i);
+				}
+				hrt_ClearTiledText();
+				for(disploop = 0; disploop < 9; disploop++)
+				{
+					hrt_PrintOnTilemap(1, 7+disploop, (char*)gl_keypad_menu[disploop]);
+				}
+				hrt_PrintOnTilemap(0, 18, (char*)gl_credit_ln0);
+				hrt_PrintOnTilemap(0, 19, (char*)gl_credit_ln1);
+				hrt_PrintOnTilemap(0, 0, (char*)gl_menu_titles[5]);
+				hrt_PrintOnTilemap(4, 7+0, (char*)gl_keypad_options[Chip8Adv->a_key]);
+				hrt_PrintOnTilemap(4, 7+1, (char*)gl_keypad_options[Chip8Adv->b_key]);
+				hrt_PrintOnTilemap(5, 7+2, (char*)gl_keypad_options[Chip8Adv->up_key]);
+				hrt_PrintOnTilemap(7, 7+3, (char*)gl_keypad_options[Chip8Adv->down_key]);
+				hrt_PrintOnTilemap(7, 7+4, (char*)gl_keypad_options[Chip8Adv->left_key]);
+				hrt_PrintOnTilemap(8, 7+5, (char*)gl_keypad_options[Chip8Adv->right_key]);
+				hrt_PrintOnTilemap(9, 7+6, (char*)gl_keypad_options[Chip8Adv->sel_key]);
+				hrt_PrintOnTilemap(8, 7+7, (char*)gl_keypad_options[Chip8Adv->strt_key]);
+				for(int i=0;i<16;i++)
+				{
+					hrt_VblankIntrWait();
+					hrt_SetFXLevel(16-i);
+				}
+				while(!(keyDown(KEY_B)))
+				{
+
+		hrt_PrintOnTilemap(0, 7+arpos, "*");
+		if(keyDown(KEY_DOWN))
+		{
+			hrt_PrintOnTilemap(0, 7+arpos, " ");
+			if(!(arpos > 8))
+			{
+				arpos++;
+			}
+			hrt_PrintOnTilemap(0, 7+arpos, "*");
+			while(keyDown(KEY_DOWN))
+			{
+				hrt_VblankIntrWait();
+			}
+		}
+		if(keyDown(KEY_UP))
+		{
+			hrt_PrintOnTilemap(0, 7+arpos, " ");
+			if(arpos > 0)
+			{
+				arpos--;
+			}
+			hrt_PrintOnTilemap(0, 7+arpos, "*");
+			while(keyDown(KEY_UP))
+			{
+				hrt_VblankIntrWait();
+			}
+				}
+					if(keyDown(KEY_A))
+					{
+						if(arpos == 0)
+						{
+							Chip8Adv->a_key++;
+							if(Chip8Adv->a_key > 0xF)
+							{
+								Chip8Adv->a_key = 0;
+							}
+							hrt_PrintOnTilemap(4, 7+arpos, (char*)gl_keypad_options[Chip8Adv->a_key]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 1)
+						{
+							Chip8Adv->b_key++;
+							if(Chip8Adv->b_key > 0xF)
+							{
+								Chip8Adv->b_key = 0;
+							}
+							hrt_PrintOnTilemap(4, 7+arpos, (char*)gl_keypad_options[Chip8Adv->b_key]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 2)
+						{
+							Chip8Adv->up_key++;
+							if(Chip8Adv->up_key > 0xF)
+							{
+								Chip8Adv->up_key = 0;
+							}
+							hrt_PrintOnTilemap(5, 7+arpos, (char*)gl_keypad_options[Chip8Adv->up_key]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 3)
+						{
+							Chip8Adv->down_key++;
+							if(Chip8Adv->down_key > 0xF)
+							{
+								Chip8Adv->down_key = 0;
+							}
+							hrt_PrintOnTilemap(7, 7+arpos, (char*)gl_keypad_options[Chip8Adv->down_key]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 4)
+						{
+							Chip8Adv->left_key++;
+							if(Chip8Adv->left_key > 0xF)
+							{
+								Chip8Adv->left_key = 0;
+							}
+							hrt_PrintOnTilemap(7, 7+arpos, (char*)gl_keypad_options[Chip8Adv->left_key]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 5)
+						{
+							Chip8Adv->right_key++;
+							if(Chip8Adv->right_key > 0xF)
+							{
+								Chip8Adv->right_key = 0;
+							}
+							hrt_PrintOnTilemap(8, 7+arpos, (char*)gl_keypad_options[Chip8Adv->right_key]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 6)
+						{
+							Chip8Adv->sel_key++;
+							if(Chip8Adv->sel_key > 0xF)
+							{
+								Chip8Adv->sel_key = 0;
+							}
+							hrt_PrintOnTilemap(9, 7+arpos, (char*)gl_keypad_options[Chip8Adv->sel_key]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 7)
+						{
+							Chip8Adv->strt_key++;
+							if(Chip8Adv->strt_key > 0xF)
+							{
+								Chip8Adv->strt_key = 0;
+							}
+							hrt_PrintOnTilemap(8, 7+arpos, (char*)gl_keypad_options[Chip8Adv->strt_key]);
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+						}
+						if(arpos == 8)
+						{
+							while(keyDown(KEY_A))
+							{
+								hrt_VblankIntrWait();
+							}
+							break;
+						}
+					}
+				}
+							while(keyDown(KEY_B))
+							{
+								hrt_VblankIntrWait();
+							}
+				arpos = 0;
+				for(int i=0;i<16;i++)
+				{
+					hrt_VblankIntrWait();
+					hrt_SetFXLevel(i);
+				}
+				hrt_ClearTiledText();
+				for(disploop = 0; disploop < 2; disploop++)
+				{
+					hrt_PrintOnTilemap(1, 7+disploop, (char*)gl_controller_options[disploop]);
+				}
 }

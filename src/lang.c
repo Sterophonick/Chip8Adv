@@ -8,7 +8,7 @@ const char *gl_main_menu_options[7] = {
 	"Exit" //Almost complete
 };
 
-const char gl_credit_ln0[] = "GBA Lives! 2018";
+const char gl_credit_ln0[] = "GBA Lives! 2019";
 const char gl_credit_ln1[] = "Chip8Adv 0.8";
 
 const char *gl_controller_options[2] = {
@@ -81,7 +81,7 @@ const char *gl_menu_titles[6] = {
 	"Reconfigure controls"
 };
 
-const char *gl_keypad_menu[8] = {
+const char *gl_keypad_menu[9] = {
 	"A: ",
 	"B: ",
 	"Up: ",
@@ -90,6 +90,26 @@ const char *gl_keypad_menu[8] = {
 	"Right: ",
 	"Select: ",
 	"Start: ",
+	"<-Back",
+};
+
+const char *gl_keypad_options[16] = {
+	"0",
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"A",
+	"B",
+	"C",
+	"D",
+	"E",
+	"F",
 };
 
 const char *gl_palettes[7] = {

@@ -3,10 +3,11 @@
 #include "lang.h"
 c8system Chip8;
 
+int pogoshell;
 u8 *PogoROM;
 
 	u8 memory[4096]; //RAM
-	u16 videobuffer[64*128]; //video for ext
+	u8 videobuffer[64*128]; //video for ext
 	u16 stack[16];
 	u8 key[16];
 	char pogoshell_romname[32];
@@ -84,20 +85,18 @@ void Initialize()
 	Chip8.drawFlag = true;
 
 	hrt_SeedRNG(Chip8Adv->random_seed);
-		u32* p = (u32 *)0x0203FC00;
-		if(p[0] == 0xFAB0BABE)		// it's pogo shell
-		{
-			p[0] = 0;
-			PogoROM = ((unsigned char *)p[-1]);
-		}
-	memcpy(&memory[0x200], &PogoROM, MAX_GAME_SIZE);
+	memcpy(&memory[0x200], REG_POGOFILEPTR, MAX_GAME_SIZE);
 	if(!(Chip8Adv->firstboot == 0))
 	{
 		Chip8Adv->firstboot = 0;
-		Chip8Adv->a_b_keybinds = 0x01;
-		Chip8Adv->up_down_keybinds = 0x23;
-		Chip8Adv->left_right_keybinds = 0x45;
-		Chip8Adv->sel_st_keybinds = 0x67;
+		Chip8Adv->a_key = 0;
+		Chip8Adv->b_key = 1;
+		Chip8Adv->up_key = 2;
+		Chip8Adv->down_key = 3;
+		Chip8Adv->left_key = 4;
+		Chip8Adv->right_key = 5;
+		Chip8Adv->sel_key = 6;
+		Chip8Adv->strt_key = 7;
 		Chip8Adv->dblsize = 1;
 		Chip8Adv->palswap = 0;
 		Chip8Adv->palette = 0;
@@ -132,7 +131,6 @@ void emulateCycle()
 					//Chip8.pc = stack[--Chip8.sp];
 					opSETPC(stack[--Chip8.sp]);
 					break;
-				/*
 				case 0x00FD: //00FD: EXIT
 					RequestExit();
 					break;
@@ -144,7 +142,6 @@ void emulateCycle()
 					Chip8.extscrmode = 1;
 					Chip8.pc+=2;
 					break;
-				*/
 				default:
 					debugger();
 			}
@@ -357,6 +354,8 @@ void tick()
 
 void render()
 {
+	BGAffineSource tempa;
+	BGAffineDest tempb;
 	register int i;
 	register int i2;
 	hrt_SetBGPalEntry(1, palettes[(Chip8Adv->palette)*2+((Chip8Adv->palswap) ? 1 : 0)]);
@@ -373,22 +372,59 @@ if(Chip8Adv->dblsize == 0)
 		REG_BG2Y = 0;
 	}else{
 		if(Chip8.extscrmode)
-			hrt_AffineBG(2, 0, 256, 00, 0);
+		{
+			REG_BG2PA = 0x100;
+			REG_BG2PB = 0;
+			REG_BG2PC = 0;
+			REG_BG2PD = 0x100;
+			REG_BG2X = 0;
+			REG_BG2Y = 0;			
+			}
 		else
-			hrt_AffineBG(2, 0, 128, 15, -30);
+		{
+			tempa.x = 124*256;
+			tempa.y = 80*256;
+			tempa.tX = 128;
+			tempa.tY = 80;
+			tempa.sX = 128;
+			tempa.sY = 128;
+			tempa.theta = 0;
+			hrt_BgAffineSet(&tempa, &tempb, 1);
+			REG_BG2PA = tempb.pa;
+			REG_BG2PB = tempb.pb;
+			REG_BG2PC = tempb.pc;
+			REG_BG2PD = tempb.pd;
+			REG_BG2X = tempb.x;
+			REG_BG2Y = tempb.y;			
+		}	
 	}
 	updatevsync = 0;
 }
-
-	register u16* temp;
+	register u16 temp;
+	switch(Chip8.extscrmode)
+	{
+		case 0:
 		for(i =0; i < 32; i++)
 		{
 			for( i2 = 0; i2 < 64; i2++)
 			{
-				temp = ((videobuffer[((i)*64+(i2+1))]) << 8 | (videobuffer[((i)*64+(i2))])) + 0x0101;
-				VRAM[(((i)+64)*120+((i2/2)+44))] = temp;
+				temp = (videobuffer[i*64+i2] << 8 | videobuffer[i*64+i2-1]);
+				VRAM[(64+i)*120+((i2+88)/2)] = temp+0x0101;
 			}
 		}
+
+			break;
+		case 1:
+			for(i =0; i < 64; i++)
+			{
+				for( i2 = 0; i2 < 128; i2++)
+				{
+					temp = ((videobuffer[((i)*128+(i2+1))]) << 8 | (videobuffer[((i)*128+(i2))])) + 0x0101;
+					VRAM[(((i)+32)*120+((i2/2)+22))] = temp;
+				}
+			}
+			break;
+	}
 	hrt_FXSetBlendMode(FX_MODE_BRIGHTEN);
 	hrt_SetFXLevel(Chip8Adv->brightness);
 	Chip8.drawFlag = 0;
@@ -404,8 +440,8 @@ void opSCDWN(u8 n)
 			h = 32;
 			disp = &videobuffer[0];
 		}else{
-			w = 64;
-			h = 32;
+			w = 128;
+			h = 64;
 			disp = &videobuffer[0];
 		}
 				nr = n*w;
@@ -423,7 +459,9 @@ void opSCR(u8 n)
 			h = 32;
 			disp = &videobuffer[0];
 		}else{
-			//u8 linebuffer[128];
+			w = 128;
+			h = 64;
+			disp = &videobuffer[0];
 		}
                 for (register unsigned int i=0; i<h; i++)
                 {

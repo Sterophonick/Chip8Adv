@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 typedef struct
 {
 	//Main CPU
@@ -32,7 +34,7 @@ extern void Keypad();
 extern void render();
 extern const unsigned char rom[];
 extern u8 memory[4096]; //RAM
-extern u16 videobuffer[64*128]; //video before it gets copied to RAM
+extern u8 videobuffer[64*128]; //video before it gets copied to RAM
 extern u16 stack[16];
 extern u8 key[16];
 extern void tick();
@@ -42,10 +44,14 @@ extern void tick();
 typedef struct
 {
 	u8 random_seed;
-	u8 a_b_keybinds; //upper 4: A
-	u8 up_down_keybinds; //upper 4: Up
-	u8 left_right_keybinds; //upper 4: Left
-	u8 sel_st_keybinds; //upper 4: Select
+	u8 a_key;
+	u8 b_key;
+	u8 up_key;
+	u8 down_key;
+	u8 left_key;
+	u8 right_key;
+	u8 sel_key;
+	u8 strt_key;
 	u8 brightness;
 	u8 palette;
 	u8 palswap;
@@ -89,3 +95,4 @@ extern int pogoshell;
 extern u32 pogotemp;
 
 extern u8 updatevsync;
+extern void MiscKeys();

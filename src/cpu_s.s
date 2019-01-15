@@ -8,6 +8,8 @@
 .global draw_sprite
 .global memset
 
+.arm
+
 //Instructions to speed up the emulator (It did by quite a bit, but it could be better :P)
 .global opCLS
 .global op1NNN
@@ -51,9 +53,9 @@ C_SP = 22
 opCLS:
 	push {r0-r3}
 	ldr r0,=videobuffer
-	ldr r1,=#0
-	ldr r2,=#0
-	ldr r3,=#4096
+	mov r1,#0
+	mov r2,#0
+	mov r3,#4096
 _opCLS:
 	add r1,r1,#1
 	strh r2,[r0,r1]
@@ -230,3 +232,4 @@ opSETDT:
 	strb r2,[r3,#16]
 	pop {r1}
 	bx lr
+	

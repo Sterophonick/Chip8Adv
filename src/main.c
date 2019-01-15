@@ -1,7 +1,7 @@
 #include <libheart.h>
 #include "cpu.h"
 #include "lang.h"
-#include "f8z.h"
+//#include "f8z.h"
 
 u32 autosleeptimer;
 
@@ -26,11 +26,10 @@ int main()
 	hrt_DSPSetBGMode(4);
 	hrt_DSPEnableBG(2);
 	hrt_DSPDisableForceBlank();
-	DetectPogo();
 	Initialize();
 	hrt_FXSetBlendMode(FX_MODE_DARKEN);
-	hrt_FXEnableBGTarget1(2);
-	autosleeptimer = 0;
+hrt_FXEnableBG(2,0);
+autosleeptimer = 0;
 	updatevsync = 1;
 	while(1)
 	{
@@ -49,6 +48,7 @@ int main()
 			render();
 		}
 		Keypad();
+		MiscKeys();
 		for(register int i = 0; i < gl_clock_speeds[Chip8Adv->clockspeed]; i++)
 		{
 			emulateCycle();
