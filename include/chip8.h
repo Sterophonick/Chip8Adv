@@ -1,0 +1,10 @@
+extern u16  opcode;
+extern u8   RAM[4096];
+extern u8   V[16];
+extern u16  I;
+extern u16  PC;
+extern u8   dTimer;
+extern u8   sTimer;
+extern u16  stack[16];
+extern u8   key[8];
+extern bool draw_flag;
